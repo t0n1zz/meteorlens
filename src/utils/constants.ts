@@ -18,4 +18,5 @@ export const STORAGE_KEYS = {
   SAVED_ADDRESSES: '@dlmm/saved_addresses',
   ACTIVE_ADDRESS: '@dlmm/active_address',
   SETTINGS: '@dlmm/settings',
+  ENTRY_SNAPSHOTS: '@dlmm/entry_snapshots',
 } as const;

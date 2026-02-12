@@ -41,18 +41,28 @@ export function PositionCard({ position, onPress }: PositionCardProps) {
         </View>
       )}
       {pnl && (
-        <View style={styles.row}>
-          <Text style={styles.label}>PnL</Text>
-          <Text style={[styles.value, pnl.totalPnlUsd >= 0 ? styles.positive : styles.negative]}>
-            {formatUsd(pnl.totalPnlUsd)} ({formatPercent(pnl.totalPnlPercent)})
-          </Text>
-        </View>
+        <>
+          <View style={styles.row}>
+            <Text style={styles.label}>PnL</Text>
+            <Text style={[styles.value, pnl.totalPnlUsd >= 0 ? styles.positive : styles.negative]}>
+              {formatUsd(pnl.totalPnlUsd)} ({formatPercent(pnl.totalPnlPercent)})
+            </Text>
+          </View>
+          {pnl.roiPercent != null && (
+            <View style={styles.row}>
+              <Text style={styles.label}>ROI</Text>
+              <Text style={[styles.value, pnl.roiPercent >= 0 ? styles.positive : styles.negative]}>
+                {formatPercent(pnl.roiPercent)}
+              </Text>
+            </View>
+          )}
+        </>
       )}
       <View style={styles.footer}>
         <Text style={styles.bins}>
           Bins {range.minBinId} – {range.maxBinId} (active: {range.activeBinId})
         </Text>
-        <RiskScore score={null} size="small" />
+        <RiskScore score={position.riskScore?.score} size="small" />
       </View>
     </>
   );

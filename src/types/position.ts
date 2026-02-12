@@ -9,6 +9,10 @@ export interface PositionRange {
   priceMin?: number;
   priceMax?: number;
   currentPrice?: number;
+  /** Distance from current price to min edge as % of range width */
+  distanceToMinPercent?: number;
+  /** Distance from current price to max edge as % of range width */
+  distanceToMaxPercent?: number;
 }
 
 export interface PositionValue {
@@ -29,6 +33,14 @@ export interface PositionFees {
   totalFeeXClaimed?: number;
   totalFeeYClaimed?: number;
   totalRewardUsdClaimed?: number;
+  /** Fee growth over time periods (from tracking) */
+  feePeriods?: {
+    daily: number;
+    weekly: number;
+    monthly: number;
+  };
+  /** Average fee growth rate (USD per day) */
+  feeGrowthRatePerDay?: number;
 }
 
 export interface PositionPnL {
@@ -39,6 +51,8 @@ export interface PositionPnL {
   impermanentLossPercent: number;
   netPnlUsd: number;
   holdValueUsd?: number;
+  /** ROI % = (totalPnlUsd / initialValueUsd) * 100 */
+  roiPercent?: number;
 }
 
 export interface AppPosition {
@@ -52,4 +66,6 @@ export interface AppPosition {
   createdAt?: number;
   pairName: string;
   shareOfPoolPercent?: number;
+  /** Computed in services/analytics/risk.ts */
+  riskScore?: { score: number; level: 'low' | 'medium' | 'high'; reasons?: string[] };
 }

@@ -13,6 +13,14 @@ export function PortfolioSummary({ positions }: PortfolioSummaryProps) {
   const totalPnl = positions.reduce((s, p) => s + (p.pnl?.totalPnlUsd ?? 0), 0);
   const totalPnlPercent = totalValue > 0 ? (totalPnl / (totalValue - totalFees)) * 100 : 0;
 
+  const byPnlPercent = [...positions].sort((a, b) => {
+    const aPct = a.pnl?.totalPnlPercent ?? 0;
+    const bPct = b.pnl?.totalPnlPercent ?? 0;
+    return bPct - aPct;
+  });
+  const best = byPnlPercent[0];
+  const worst = byPnlPercent.length > 1 ? byPnlPercent[byPnlPercent.length - 1] : null;
+
   return (
     <View style={styles.wrap}>
       <Text style={styles.title}>Portfolio</Text>
@@ -30,6 +38,22 @@ export function PortfolioSummary({ positions }: PortfolioSummaryProps) {
           {formatUsd(totalPnl)} ({formatPercent(totalPnlPercent)})
         </Text>
       </View>
+      {best && (
+        <View style={styles.row}>
+          <Text style={styles.label}>Best</Text>
+          <Text style={[styles.value, styles.positive]}>
+            {best.pairName} {formatPercent(best.pnl?.totalPnlPercent ?? 0)}
+          </Text>
+        </View>
+      )}
+      {worst && worst !== best && (
+        <View style={styles.row}>
+          <Text style={styles.label}>Worst</Text>
+          <Text style={[styles.value, (worst.pnl?.totalPnlPercent ?? 0) >= 0 ? styles.positive : styles.negative]}>
+            {worst.pairName} {formatPercent(worst.pnl?.totalPnlPercent ?? 0)}
+          </Text>
+        </View>
+      )}
       <View style={styles.row}>
         <Text style={styles.label}>Positions</Text>
         <Text style={styles.value}>{positions.length}</Text>

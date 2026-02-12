@@ -28,7 +28,7 @@ export function PositionDetailScreen({ position, onBack }: PositionDetailScreenP
     );
   }
 
-  const { value, range, fees, pnl, pairName } = position;
+  const { value, range, fees, pnl, pairName, createdAt } = position;
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
@@ -62,6 +62,34 @@ export function PositionDetailScreen({ position, onBack }: PositionDetailScreenP
               <Text style={styles.value}>{formatPercent(fees.feeApr24h)}</Text>
             </View>
           )}
+          {fees.feePeriods && (
+            <>
+              {fees.feePeriods.daily > 0 && (
+                <View style={styles.row}>
+                  <Text style={styles.label}>Last 24h</Text>
+                  <Text style={styles.value}>{formatUsd(fees.feePeriods.daily)}</Text>
+                </View>
+              )}
+              {fees.feePeriods.weekly > 0 && (
+                <View style={styles.row}>
+                  <Text style={styles.label}>Last 7 days</Text>
+                  <Text style={styles.value}>{formatUsd(fees.feePeriods.weekly)}</Text>
+                </View>
+              )}
+              {fees.feePeriods.monthly > 0 && (
+                <View style={styles.row}>
+                  <Text style={styles.label}>Last 30 days</Text>
+                  <Text style={styles.value}>{formatUsd(fees.feePeriods.monthly)}</Text>
+                </View>
+              )}
+              {fees.feeGrowthRatePerDay != null && fees.feeGrowthRatePerDay > 0 && (
+                <View style={styles.row}>
+                  <Text style={styles.label}>Avg per day</Text>
+                  <Text style={styles.value}>{formatUsd(fees.feeGrowthRatePerDay)}</Text>
+                </View>
+              )}
+            </>
+          )}
         </Card>
 
         {pnl && (
@@ -70,6 +98,14 @@ export function PositionDetailScreen({ position, onBack }: PositionDetailScreenP
             <Text style={[styles.bigValue, pnl.totalPnlUsd >= 0 ? styles.positive : styles.negative]}>
               {formatUsd(pnl.totalPnlUsd)} ({formatPercent(pnl.totalPnlPercent)})
             </Text>
+            {pnl.roiPercent != null && (
+              <View style={styles.row}>
+                <Text style={styles.label}>ROI</Text>
+                <Text style={[styles.value, pnl.roiPercent >= 0 ? styles.positive : styles.negative]}>
+                  {formatPercent(pnl.roiPercent)}
+                </Text>
+              </View>
+            )}
             <View style={styles.row}>
               <Text style={styles.label}>Fee income</Text>
               <Text style={styles.value}>{formatUsd(pnl.feeIncomeUsd)}</Text>
@@ -89,7 +125,35 @@ export function PositionDetailScreen({ position, onBack }: PositionDetailScreenP
             Bins {range.minBinId} – {range.maxBinId}
           </Text>
           <Text style={styles.muted}>Active bin: {range.activeBinId}</Text>
+          {range.distanceToMinPercent != null && range.distanceToMaxPercent != null && (
+            <>
+              <View style={styles.row}>
+                <Text style={styles.label}>Distance to min edge</Text>
+                <Text style={styles.value}>
+                  {range.distanceToMinPercent.toFixed(1)}%
+                </Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>Distance to max edge</Text>
+                <Text style={styles.value}>
+                  {range.distanceToMaxPercent.toFixed(1)}%
+                </Text>
+              </View>
+            </>
+          )}
         </Card>
+
+        {createdAt != null && (
+          <Card style={styles.card}>
+            <Text style={styles.cardTitle}>Entry</Text>
+            <Text style={styles.muted}>
+              {new Date(createdAt).toLocaleDateString(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+              })}
+            </Text>
+          </Card>
+        )}
 
         {pool && (
           <Card style={styles.card}>
@@ -102,6 +166,14 @@ export function PositionDetailScreen({ position, onBack }: PositionDetailScreenP
               <View style={styles.row}>
                 <Text style={styles.label}>24h volume</Text>
                 <Text style={styles.value}>{formatUsd(pool.volume['24h'])}</Text>
+              </View>
+            )}
+            {pool.tvl != null && pool.tvl > 0 && pool.volume?.['24h'] != null && (
+              <View style={styles.row}>
+                <Text style={styles.label}>24h volume / TVL</Text>
+                <Text style={styles.value}>
+                  {((pool.volume['24h'] / pool.tvl) * 100).toFixed(1)}%
+                </Text>
               </View>
             )}
           </Card>

@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { WalletInputScreen } from '../screens/WalletInputScreen';
 import { DashboardScreen } from '../screens/DashboardScreen';
@@ -19,8 +21,20 @@ export type RootTabParams = {
   Settings: undefined;
 };
 
-const Stack = createNativeStackNavigator<TrackStackParams>();
+// Native stack uses native headers that can break on web (e.g. HeaderTitle font). Use JS stack on web.
+const NativeStack = createNativeStackNavigator<TrackStackParams>();
+const WebStack = createStackNavigator<TrackStackParams>();
+const Stack = Platform.OS === 'web' ? WebStack : NativeStack;
 const Tab = createBottomTabNavigator<RootTabParams>();
+
+const sharedStackScreenOptions = {
+  headerStyle: { backgroundColor: '#0f0f14' },
+  headerTintColor: '#fff',
+  headerShadowVisible: false,
+  contentStyle: { backgroundColor: '#0f0f14' },
+  cardStyle: { backgroundColor: '#0f0f14' },
+  headerTitleStyle: { fontWeight: 'bold' as const },
+};
 
 function TrackStack() {
   const activeAddress = useAddressesStore((s) => s.activeAddress);
@@ -29,12 +43,7 @@ function TrackStack() {
   return (
     <Stack.Navigator
       initialRouteName={initialRoute}
-      screenOptions={{
-        headerStyle: { backgroundColor: '#0f0f14' },
-        headerTintColor: '#fff',
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: '#0f0f14' },
-      }}
+      screenOptions={sharedStackScreenOptions}
     >
       <Stack.Screen
         name="WalletInput"
@@ -77,7 +86,12 @@ export function AppNavigator() {
   }, [hydrate]);
 
   if (!hydrated) {
-    return null;
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#9945FF" />
+        <Text style={styles.loadingText}>Loading…</Text>
+      </View>
+    );
   }
 
   return (
@@ -94,3 +108,17 @@ export function AppNavigator() {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  loading: {
+    flex: 1,
+    backgroundColor: '#0f0f14',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+  },
+  loadingText: {
+    color: '#888',
+    fontSize: 16,
+  },
+});

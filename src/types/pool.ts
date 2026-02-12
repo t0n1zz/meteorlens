@@ -23,4 +23,6 @@ export interface PoolMetrics {
   bin_step?: number;
   active_bin_id?: number;
   fees_24h?: number;
+  /** Money flow metrics (calculated) */
+  moneyFlow?: import('../services/analytics/moneyFlow').MoneyFlowMetrics;
 }

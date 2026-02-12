@@ -1,13 +1,13 @@
 /**
- * Expo config. Loads EXPO_PUBLIC_HELIUS_API_KEY from env for RPC.
- * For Solana Seeker / dApp Store: build with EAS or local APK per docs.
+ * Expo config. Web-first; Solana Seeker / mobile when you run build for iOS/Android.
+ * Loads EXPO_PUBLIC_HELIUS_API_KEY from env for RPC.
  */
 export default {
   expo: {
     name: "DLMM Position Dashboard",
     slug: "dlmm-dashboard",
     version: "0.1.0",
-    orientation: "portrait",
+    orientation: "default",
     userInterfaceStyle: "dark",
     scheme: "dlmm-dashboard",
     splash: { resizeMode: "contain", backgroundColor: "#0f0f14" },

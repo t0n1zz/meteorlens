@@ -1,13 +1,12 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CommonActions } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AddressInput } from '../components/wallet/AddressInput';
 import { AddressManager } from '../components/wallet/AddressManager';
 import { useAddresses } from '../hooks/useAddresses';
 import { useAddressesStore } from '../store/addressesStore';
-import { usePositions } from '../hooks/usePositions';
 import type { TrackStackParams } from '../navigation/AppNavigator';
 
 type Nav = NativeStackNavigationProp<TrackStackParams, 'WalletInput'>;
@@ -15,9 +14,6 @@ type Nav = NativeStackNavigationProp<TrackStackParams, 'WalletInput'>;
 export function WalletInputScreen() {
   const navigation = useNavigation<Nav>();
   const activeAddress = useAddressesStore((s) => s.activeAddress);
-  useEffect(() => {
-    if (activeAddress) navigation.replace('Dashboard');
-  }, [activeAddress, navigation]);
   const {
     addresses,
     addAddress,
@@ -25,19 +21,21 @@ export function WalletInputScreen() {
     removeAddress,
     hydrated,
   } = useAddresses();
-  const { loadPositions, loading, error } = usePositions();
 
   const handleSubmit = async (address: string) => {
     await addAddress(address, address.slice(0, 8));
     await setActiveAddress(address);
-    await loadPositions(address);
-    navigation.replace('Dashboard');
+    // Navigate first so user always sees Dashboard; positions load via usePositions effect
+    navigation.dispatch(
+      CommonActions.reset({ index: 0, routes: [{ name: 'Dashboard' }] })
+    );
   };
 
   const handleSelectSaved = async (address: string) => {
     await setActiveAddress(address);
-    await loadPositions(address);
-    navigation.replace('Dashboard');
+    navigation.dispatch(
+      CommonActions.reset({ index: 0, routes: [{ name: 'Dashboard' }] })
+    );
   };
 
   return (
@@ -62,12 +60,7 @@ export function WalletInputScreen() {
               onRemove={removeAddress}
             />
           )}
-          <AddressInput onSubmit={handleSubmit} loading={loading} />
-          {error ? (
-            <View style={styles.errorWrap}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          ) : null}
+          <AddressInput onSubmit={handleSubmit} loading={false} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -80,6 +73,4 @@ const styles = StyleSheet.create({
   scroll: { padding: 20, paddingBottom: 40 },
   title: { fontSize: 24, fontWeight: '700', color: '#fff', marginBottom: 8 },
   subtitle: { fontSize: 14, color: '#888', marginBottom: 20 },
-  errorWrap: { marginTop: 12 },
-  errorText: { color: '#f66', fontSize: 14 },
 });
