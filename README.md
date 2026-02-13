@@ -1,6 +1,6 @@
 # Meteora DLMM Portfolio Tracker (Meteor Lens)
 
-**Web-first** DeFi portfolio tracker for **Meteora DLMM** (Dynamic Liquidity Market Maker) on Solana. Track liquidity provider positions with position value, fees, PnL, and in/out-of-range status. **Read-only**: paste wallet addresses — no wallet connection or private keys.
+**Mobile-first** DeFi portfolio tracker for **Meteora DLMM** (Dynamic Liquidity Market Maker) on Solana. Track liquidity provider positions with position value, fees, PnL, and in/out-of-range status. **Read-only**: paste wallet addresses — no wallet connection or private keys.
 
 Built with **Expo (React Native)** so you can run in the **browser** now and target **Solana Seeker / mobile** when you’re ready.
 
@@ -32,6 +32,7 @@ This opens the app in your **browser** (Expo web). Paste a wallet address and ta
 - **"The required package `expo-asset` cannot be found"** — Run `npm run install:fix` (or `npm install --legacy-peer-deps`).
 - **Blank screen** — The app shows "Loading…" briefly while saved addresses are read; then the main screen appears.
 - **Peer dependency conflicts** — Use `npm install --legacy-peer-deps` (or `npm run install:fix`).
+- **Not seeing UI changes?** Stop the dev server (Ctrl+C), run `npm start` again, and hard-refresh the browser (Cmd+Shift+R or Ctrl+Shift+R).
 
 ## Environment
 
@@ -80,13 +81,23 @@ See **`docs/DEVELOPMENT_PLAN.md`** for the full roadmap (phases, current vs plan
 | `npm run fetch-pools` | List sample pools (Meteora API) |
 | `POSITION_ADDRESS=<pubkey> npm run fetch-position` | One position fee data |
 
-## Later: mobile / Solana Seeker
+## Solana Seeker / mobile readiness
 
-When you want to ship on Solana Seeker or the dApp Store:
+**Running on device (Expo Go or dev build):** ✅ Ready. The app is a single Expo (React Native) codebase that runs on web and native.
 
-- **Stack**: Same Expo app; run `npm run start:mobile` and open in Expo Go, or build with EAS.
-- **Build**: See [Building a release APK with Expo](https://docs.solanamobile.com/dapp-publishing/building-expo-apk) and [Prepare your dApp for publishing](https://docs.solanamobile.com/dapp-publishing/prepare).
-- **Privacy**: Read-only; no private keys, no transaction signing. Addresses stored on device only.
+- **Quick test on phone:** `npm run start:mobile` → scan QR with Expo Go (SDK 54) on your device, or press `a` for Android emulator.
+- **Native build (no Expo Go):** `npm run android` (requires Android SDK / Android Studio) or set up [EAS Build](https://docs.expo.dev/build/introduction/) for a standalone APK.
+
+**Submitting to the Solana dApp Store (Seeker):** You’ll need to complete Phase 5-style steps before submission:
+
+| Step | What’s needed |
+|------|----------------|
+| **Signed release APK** | Build a release APK with a **dedicated** signing key (not your Google Play key). See [Building a release APK with Expo](https://docs.solanamobile.com/dapp-publishing/building-expo-apk). |
+| **Store assets** | Icon 512×512, banner 1200×600, at least 4 screenshots or videos (e.g. 1080p). See [Prepare your dApp for publishing](https://docs.solanamobile.com/dapp-publishing/prepare). |
+| **config.yaml** | dApp Store metadata (name, description, asset paths) in the publishing repo. |
+| **Legal** | Privacy policy and terms (read-only, no keys, addresses local-only). |
+
+Optional later: Solana Mobile Wallet Adapter (one-tap address), deep link `?address=...`, QR scanner, push for alerts — see `docs/DEVELOPMENT_PLAN.md` Phase 5.
 
 ## Security & privacy
 

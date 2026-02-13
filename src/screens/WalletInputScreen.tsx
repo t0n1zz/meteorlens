@@ -5,14 +5,17 @@ import { useNavigation, CommonActions } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AddressInput } from '../components/wallet/AddressInput';
 import { AddressManager } from '../components/wallet/AddressManager';
+import { AppLogo } from '../components/common/AppLogo';
 import { useAddresses } from '../hooks/useAddresses';
 import { useAddressesStore } from '../store/addressesStore';
+import { useTheme } from '../hooks/useTheme';
 import type { TrackStackParams } from '../navigation/AppNavigator';
 
 type Nav = NativeStackNavigationProp<TrackStackParams, 'WalletInput'>;
 
 export function WalletInputScreen() {
   const navigation = useNavigation<Nav>();
+  const { screen } = useTheme();
   const activeAddress = useAddressesStore((s) => s.activeAddress);
   const {
     addresses,
@@ -25,7 +28,6 @@ export function WalletInputScreen() {
   const handleSubmit = async (address: string) => {
     await addAddress(address, address.slice(0, 8));
     await setActiveAddress(address);
-    // Navigate first so user always sees Dashboard; positions load via usePositions effect
     navigation.dispatch(
       CommonActions.reset({ index: 0, routes: [{ name: 'Dashboard' }] })
     );
@@ -39,7 +41,7 @@ export function WalletInputScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: screen.background }]} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboard}
@@ -47,9 +49,10 @@ export function WalletInputScreen() {
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>Meteora DLMM Tracker</Text>
-          <Text style={styles.subtitle}>
+          <AppLogo size="lg" showTagline />
+          <Text style={[styles.subtitle, { color: screen.textMuted }]}>
             Paste a Solana wallet address to track DLMM positions. Read-only — no connection or private keys.
           </Text>
           {hydrated && (
@@ -68,9 +71,8 @@ export function WalletInputScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0f0f14' },
+  container: { flex: 1 },
   keyboard: { flex: 1 },
-  scroll: { padding: 20, paddingBottom: 40 },
-  title: { fontSize: 24, fontWeight: '700', color: '#fff', marginBottom: 8 },
-  subtitle: { fontSize: 14, color: '#888', marginBottom: 20 },
+  scroll: { padding: 24, paddingBottom: 48 },
+  subtitle: { fontSize: 15, lineHeight: 22, marginTop: 8, marginBottom: 24 },
 });

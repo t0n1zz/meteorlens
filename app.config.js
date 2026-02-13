@@ -10,11 +10,11 @@ export default {
     orientation: "default",
     userInterfaceStyle: "dark",
     scheme: "dlmm-dashboard",
-    splash: { resizeMode: "contain", backgroundColor: "#0f0f14" },
+    splash: { resizeMode: "contain", backgroundColor: "#0c0c0f" },
     assetBundlePatterns: ["**/*"],
     ios: { supportsTablet: true, bundleIdentifier: "com.dlmm.dashboard" },
     android: {
-      adaptiveIcon: { backgroundColor: "#0f0f14" },
+      adaptiveIcon: { backgroundColor: "#0c0c0f" },
       package: "com.dlmm.dashboard",
     },
     extra: {

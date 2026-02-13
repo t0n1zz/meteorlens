@@ -23,6 +23,7 @@ import { computeRiskScore } from '../analytics/risk';
 import { getOrCreateEntrySnapshot } from '../positions/entrySnapshot';
 import { calculateDistanceToEdges } from '../../utils/rangeUtils';
 import { recordFeeSnapshot, calculateFeePeriods } from '../positions/feeTracking';
+import { recordPnLHistory } from '../positions/pnlHistory';
 
 /** LbPair address -> pool metrics cache to avoid repeated API calls */
 const poolCache = new Map<string, PoolMetrics>();
@@ -189,6 +190,10 @@ async function toAppPosition(
             : 0,
         }
       : undefined;
+
+  if (pnl) {
+    await recordPnLHistory(positionPubkey, valueUsd, pnl.totalPnlUsd, pnl.totalPnlPercent);
+  }
 
   let shareOfPoolPercent: number | undefined;
   if (pool.tvl != null && pool.tvl > 0 && valueUsd > 0) {

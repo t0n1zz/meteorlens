@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { formatUsd, formatPercent } from '../../utils/formatters';
+import { useTheme } from '../../hooks/useTheme';
 import type { AppPosition } from '../../types/position';
 
 interface PortfolioAllocationProps {
@@ -14,8 +15,9 @@ interface AllocationItem {
 }
 
 export function PortfolioAllocation({ positions }: PortfolioAllocationProps) {
+  const { screen } = useTheme();
   const totalValue = positions.reduce((s, p) => s + p.value.valueUsd, 0);
-  
+
   if (totalValue === 0 || positions.length === 0) return null;
 
   // Allocation by pool
@@ -53,20 +55,20 @@ export function PortfolioAllocation({ positions }: PortfolioAllocationProps) {
     .slice(0, 5); // Top 5 tokens
 
   return (
-    <View style={styles.wrap}>
-      <Text style={styles.title}>Allocation</Text>
-      
+    <View style={[styles.wrap, { backgroundColor: screen.card, borderColor: screen.cardBorder }]}>
+      <Text style={[styles.title, { color: screen.text }]}>Allocation</Text>
+
       {poolAllocation.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>By Pool</Text>
+          <Text style={[styles.sectionLabel, { color: screen.textMuted }]}>By Pool</Text>
           {poolAllocation.map((item) => (
             <View key={item.label} style={styles.row}>
-              <Text style={styles.label} numberOfLines={1}>
+              <Text style={[styles.label, { color: screen.text }]} numberOfLines={1}>
                 {item.label}
               </Text>
               <View style={styles.values}>
-                <Text style={styles.value}>{formatUsd(item.valueUsd)}</Text>
-                <Text style={styles.percent}>{formatPercent(item.percent)}</Text>
+                <Text style={[styles.value, { color: screen.text }]}>{formatUsd(item.valueUsd)}</Text>
+                <Text style={[styles.percent, { color: screen.textMuted }]}>{formatPercent(item.percent)}</Text>
               </View>
             </View>
           ))}
@@ -75,15 +77,15 @@ export function PortfolioAllocation({ positions }: PortfolioAllocationProps) {
 
       {tokenAllocation.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>By Token</Text>
+          <Text style={[styles.sectionLabel, { color: screen.textMuted }]}>By Token</Text>
           {tokenAllocation.map((item) => (
             <View key={item.label} style={styles.row}>
-              <Text style={styles.label} numberOfLines={1}>
+              <Text style={[styles.label, { color: screen.text }]} numberOfLines={1}>
                 {item.label}
               </Text>
               <View style={styles.values}>
-                <Text style={styles.value}>{formatUsd(item.valueUsd)}</Text>
-                <Text style={styles.percent}>{formatPercent(item.percent)}</Text>
+                <Text style={[styles.value, { color: screen.text }]}>{formatUsd(item.valueUsd)}</Text>
+                <Text style={[styles.percent, { color: screen.textMuted }]}>{formatPercent(item.percent)}</Text>
               </View>
             </View>
           ))}
@@ -95,36 +97,32 @@ export function PortfolioAllocation({ positions }: PortfolioAllocationProps) {
 
 const styles = StyleSheet.create({
   wrap: {
-    backgroundColor: '#1a1a22',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 18,
     borderWidth: 1,
-    borderColor: '#2a2a35',
-    marginBottom: 16,
+    marginBottom: 20,
   },
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   section: {
     marginBottom: 16,
   },
   sectionLabel: {
     fontSize: 12,
-    color: '#888',
     marginBottom: 8,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   label: {
-    color: '#fff',
     fontSize: 14,
     flex: 1,
     marginRight: 12,
@@ -135,12 +133,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   value: {
-    color: '#fff',
     fontSize: 14,
     fontWeight: '600',
   },
   percent: {
-    color: '#888',
     fontSize: 12,
   },
 });

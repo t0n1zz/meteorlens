@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, TextInput, StyleSheet, Platform } from 'react-native';
 import { Button } from '../common/Button';
 import { Alert } from '../common/Alert';
+import { useTheme } from '../../hooks/useTheme';
 import { validateAddressInput } from './AddressValidator';
 
 interface AddressInputProps {
@@ -15,6 +16,7 @@ export function AddressInput({
   loading = false,
   placeholder = 'Paste Solana wallet address...',
 }: AddressInputProps) {
+  const { screen } = useTheme();
   const [value, setValue] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -31,9 +33,17 @@ export function AddressInput({
   return (
     <View style={styles.wrap}>
       <TextInput
-        style={[styles.input, error ? styles.inputError : null]}
+        style={[
+          styles.input,
+          {
+            backgroundColor: screen.card,
+            borderColor: error ? screen.negative : screen.cardBorder,
+            color: screen.text,
+          },
+          Platform.OS === 'web' ? { outlineStyle: 'none' as const } : {},
+        ]}
         placeholder={placeholder}
-        placeholderTextColor="#666"
+        placeholderTextColor={screen.textMuted}
         value={value}
         onChangeText={(t) => {
           setValue(t);
@@ -62,17 +72,12 @@ export function AddressInput({
 const styles = StyleSheet.create({
   wrap: { marginBottom: 16 },
   input: {
-    backgroundColor: '#1a1a22',
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 16,
-    fontSize: 14,
-    color: '#fff',
+    fontSize: 15,
     borderWidth: 1,
-    borderColor: '#2a2a35',
     marginBottom: 12,
-    ...(Platform.OS === 'web' ? { outlineStyle: 'none' } : {}),
   },
-  inputError: { borderColor: '#a44' },
   errorWrap: { marginBottom: 12 },
   button: { marginTop: 4 },
 });

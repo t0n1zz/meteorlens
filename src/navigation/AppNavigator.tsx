@@ -9,6 +9,7 @@ import { PositionDetailScreen } from '../screens/PositionDetailScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { useAddressesStore } from '../store/addressesStore';
 import { usePositionsStore } from '../store/positionsStore';
+import { useTheme } from '../hooks/useTheme';
 
 export type TrackStackParams = {
   WalletInput: undefined;
@@ -27,23 +28,29 @@ const WebStack = createStackNavigator<TrackStackParams>();
 const Stack = Platform.OS === 'web' ? WebStack : NativeStack;
 const Tab = createBottomTabNavigator<RootTabParams>();
 
-const sharedStackScreenOptions = {
-  headerStyle: { backgroundColor: '#0f0f14' },
-  headerTintColor: '#fff',
-  headerShadowVisible: false,
-  contentStyle: { backgroundColor: '#0f0f14' },
-  cardStyle: { backgroundColor: '#0f0f14' },
-  headerTitleStyle: { fontWeight: 'bold' as const },
-};
+function getStackScreenOptions(isDark: boolean) {
+  const bg = isDark ? '#0f0f14' : '#f4f4f5';
+  const tint = isDark ? '#fff' : '#18181b';
+  return {
+    headerStyle: { backgroundColor: bg },
+    headerTintColor: tint,
+    headerShadowVisible: false,
+    contentStyle: { backgroundColor: bg },
+    cardStyle: { backgroundColor: bg },
+    headerTitleStyle: { fontWeight: 'bold' as const },
+  };
+}
 
 function TrackStack() {
   const activeAddress = useAddressesStore((s) => s.activeAddress);
   const initialRoute = activeAddress ? 'Dashboard' : 'WalletInput';
+  const theme = useTheme();
+  const stackOptions = getStackScreenOptions(theme.dark);
 
   return (
     <Stack.Navigator
       initialRouteName={initialRoute}
-      screenOptions={sharedStackScreenOptions}
+      screenOptions={stackOptions}
     >
       <Stack.Screen
         name="WalletInput"
@@ -80,6 +87,7 @@ function PositionDetailWrapper({
 export function AppNavigator() {
   const hydrated = useAddressesStore((s) => s.hydrated);
   const hydrate = useAddressesStore((s) => s.hydrate);
+  const theme = useTheme();
 
   useEffect(() => {
     hydrate();
@@ -87,20 +95,23 @@ export function AppNavigator() {
 
   if (!hydrated) {
     return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color="#9945FF" />
-        <Text style={styles.loadingText}>Loading…</Text>
+      <View style={[styles.loading, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={[styles.loadingText, { color: theme.colors.text }]}>Loading…</Text>
       </View>
     );
   }
+
+  const tabBarBg = theme.screen.card;
+  const tabBarBorder = theme.screen.cardBorder;
 
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: '#1a1a22', borderTopColor: '#2a2a35' },
-        tabBarActiveTintColor: '#9945FF',
-        tabBarInactiveTintColor: '#888',
+        tabBarStyle: { backgroundColor: tabBarBg, borderTopColor: tabBarBorder },
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.screen.textMuted,
       }}
     >
       <Tab.Screen name="Track" component={TrackStack} options={{ title: 'Positions' }} />
@@ -112,13 +123,11 @@ export function AppNavigator() {
 const styles = StyleSheet.create({
   loading: {
     flex: 1,
-    backgroundColor: '#0f0f14',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
   },
   loadingText: {
-    color: '#888',
     fontSize: 16,
   },
 });
